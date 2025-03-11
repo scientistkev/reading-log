@@ -2,5 +2,7 @@
    Author: Brad Gooch
    
    Start: March 9
-   - Keith grew up in Kutztown! Gooch did a nice job describing the artists who came from these small industrial towns in PA (Warhol, for instance)
+   - Keith grew up in Kutztown, PA! Gooch did a nice job describing the artists 
+   who came from these small industrial towns in PA (Warhol, for instance)
+   - 
    End: ?
