@@ -9,7 +9,8 @@ Current structure:
 
 ```
 ├── 2025
-│   └── march.txt
+│   ├── march-articles.txt
+│   └── march-books.txt
 ├── LICENSE
 └── README.md
 ```
