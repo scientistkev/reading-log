@@ -6,4 +6,27 @@
 - Subscribed to the Financial Times; Tyler Cowen always links from this
 and I find the aesthetic nice to look at
 
+// Read: The Hypercuriosity Theory of ADHD
+// An Interview with Anne-Laure Le Cunff by Gurjot Brar
+From the Evolution and Psychiatry Substack <https://epsig.substack.com/>
+- Interesting take on ADHD; research found that the literature lacked an
+advantage-based explanation of ADHD and focused on deficits.
+- Here's what GPT-4.5 had to summarize the interview:
+    - Evolutionary Mismatch of Curiosity: The interview outlines how ADHD 
+    traits like distractibility and impulsivity may result from an evolutionary 
+    mismatch—where high trait curiosity was once adaptive for exploration and 
+    survival in unpredictable, resource-scarce environments but now conflicts 
+    with modern, structured settings.
+    - Integration of Neuroscience and Evolutionary Psychology: The theory 
+    builds on prior evolutionary research and incorporates neuroscientific 
+    and psychological findings to argue that hypercuriosity drives both 
+    beneficial exploratory behaviors and the challenges 
+    (e.g., shifting focus) commonly seen in ADHD.
+    - Implications for Strength-Based Interventions: By reframing ADHD 
+    as involving adaptive traits, the theory suggests that interventions 
+    should harness natural curiosity—such as through personalized, engaging 
+    educational methods—instead of solely focusing on mitigating deficits.
+
+
+
 
