@@ -6,11 +6,11 @@
 - Subscribed to the Financial Times; Tyler Cowen always links from this
 and I find the aesthetic nice to look at
 
-// Read: The Hypercuriosity Theory of ADHD
-// An Interview with Anne-Laure Le Cunff by Gurjot Brar
-// 1800 words
+-- Read: The Hypercuriosity Theory of ADHD
+    An Interview with Anne-Laure Le Cunff by Gurjot Brar
+    1800 words
 
-// From the Evolution and Psychiatry Substack <https://epsig.substack.com/>
+- From the Evolution and Psychiatry Substack <https://epsig.substack.com/>
 
 - Interesting take on ADHD; research found that the literature lacked an
 advantage-based explanation of ADHD and focused on deficits.
@@ -31,5 +31,28 @@ advantage-based explanation of ADHD and focused on deficits.
     should harness natural curiosity—such as through personalized, engaging 
     educational methods—instead of solely focusing on mitigating deficits.
 
-//
+-- March 17, 2025 ---
+
+-- Read: Federal Land Can Be Home Sweet Home
+   by Scott Turner and Doug Burgum
+
+- For the Wall Street Journal 
+<https://www.wsj.com/opinion/federal-land-can-be-home-sweet-home-joint-task-
+force-hud-interior-department-housing-affordability-3a281d36?mod=Searchresults_
+pos2&page=1>
+
+- "The Interior Department oversees more than 500 million acres of federal 
+land, much of it suitable for residential use. The Department of Housing and 
+Urban Development brings expertise in housing policy and community development. 
+Together we are creating the Joint Task Force on Federal Land for Housing to 
+increase housing supply and decrease costs for millions of Americans."
+
+- "Streamlining the regulatory process is a cornerstone of this partnership. 
+Historically, building on federal land is a nightmare of red tape—lengthy 
+environmental reviews, complex transfer protocols and disjointed agency 
+priorities. This partnership will cut through the bureaucracy. 
+Interior will reduce the red tape behind land transfers or leases to public 
+housing authorities, nonprofits and local governments."
+
+- Skeptical on this take 
 
