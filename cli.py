@@ -124,9 +124,9 @@ def get_file_path(content_type, base_dir="."):
 
 def format_entry(content_type, title, author, word_count, url, date):
     """Format entry according to existing file structure."""
-    date_str = date.strftime("%B %d, %Y")
-    
     if content_type == "article":
+        # Articles use full date format with year
+        date_str = date.strftime("%B %d, %Y")
         entry = f"\n--- {date_str} ---\n\n"
         entry += f"-- Read: {title}\n"
         if author:
@@ -134,6 +134,8 @@ def format_entry(content_type, title, author, word_count, url, date):
         entry += f"   {word_count} words\n\n"
         entry += f"- {url}\n"
     else:  # book
+        # Books use short date format without year
+        date_str = date.strftime("%B %d")
         entry = f"\n{title}\n"
         if author:
             entry += f"   Author: {author}\n"
