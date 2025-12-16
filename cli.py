@@ -113,10 +113,13 @@ def get_file_path(content_type, base_dir="."):
     
     if content_type == "book":
         filename = f"{month_name}-books.txt"
+        return year_dir / filename
     else:
+        # Articles go in the articles subfolder
+        articles_dir = year_dir / "articles"
+        articles_dir.mkdir(exist_ok=True)
         filename = f"{month_name}-articles.txt"
-    
-    return year_dir / filename
+        return articles_dir / filename
 
 
 def format_entry(content_type, title, author, word_count, url, date):
