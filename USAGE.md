@@ -2,11 +2,30 @@
 
 ## Installation
 
-First, install the required dependencies:
+### Set Up Virtual Environment (Recommended)
+
+It's recommended to use a virtual environment to keep dependencies isolated:
+
+```bash
+# Create a virtual environment
+python3 -m venv venv
+
+# Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+```
+
+### Install Dependencies
+
+Once your virtual environment is activated, install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+**Note:** When you're done using the CLI, you can deactivate the virtual environment by running `deactivate`.
 
 ## Usage
 
