@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+"""
+CLI tool for logging reading materials from URLs.
+"""
+
+import argparse
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse
+
+import requests
+from bs4 import BeautifulSoup
+
+
+def fetch_url_content(url):
+    """Fetch content from a URL and return the HTML."""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        raise Exception(f"Failed to fetch URL: {e}")
+
+
+def extract_text_from_html(html_content):
+    """Extract readable text from HTML content."""
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Remove script and style elements
+    for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
+        script.decompose()
+    
+    # Try to find main content areas
+    main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile(r'content|article|post|entry', re.I))
+    
+    if main_content:
+        text = main_content.get_text(separator=' ', strip=True)
+    else:
+        # Fallback to body text
+        text = soup.get_text(separator=' ', strip=True)
+    
+    # Clean up whitespace
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+
+def count_words(text):
+    """Count words in text."""
+    if not text:
+        return 0
+    words = re.findall(r'\b\w+\b', text)
+    return len(words)
+
+
+def extract_metadata(html_content, url):
+    """Extract title and author from HTML."""
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Extract title
+    title = None
+    title_tag = soup.find('title')
+    if title_tag:
+        title = title_tag.get_text(strip=True)
+    
+    # Try to find article title in meta tags or h1
+    og_title = soup.find('meta', property='og:title')
+    if og_title and og_title.get('content'):
+        title = og_title.get('content')
+    
+    h1_tag = soup.find('h1')
+    if h1_tag and h1_tag.get_text(strip=True):
+        title = h1_tag.get_text(strip=True)
+    
+    # Extract author
+    author = None
+    author_meta = soup.find('meta', {'name': re.compile(r'author', re.I)})
+    if author_meta:
+        author = author_meta.get('content')
+    
+    # Try to find author in common patterns
+    author_tag = soup.find('span', class_=re.compile(r'author|byline', re.I))
+    if author_tag:
+        author = author_tag.get_text(strip=True)
+    
+    return title or "Untitled", author
+
+
+def determine_type(word_count, url):
+    """Determine if content is a book or article based on word count and URL."""
+    # Books typically have much higher word counts (usually 50k+ words)
+    # Articles are typically under 10k words
+    # We'll use 20k as a threshold, but allow user override
+    
+    if word_count > 20000:
+        return "book"
+    else:
+        return "article"
+
+
+def get_file_path(content_type, base_dir="."):
+    """Get the appropriate file path based on content type and current date."""
+    now = datetime.now()
+    year = now.year
+    month_name = now.strftime("%B").lower()
+    
+    year_dir = Path(base_dir) / str(year)
+    year_dir.mkdir(exist_ok=True)
+    
+    if content_type == "book":
+        filename = f"{month_name}-books.txt"
+    else:
+        filename = f"{month_name}-articles.txt"
+    
+    return year_dir / filename
+
+
+def format_entry(content_type, title, author, word_count, url, date):
+    """Format entry according to existing file structure."""
+    date_str = date.strftime("%B %d, %Y")
+    
+    if content_type == "article":
+        entry = f"\n--- {date_str} ---\n\n"
+        entry += f"-- Read: {title}\n"
+        if author:
+            entry += f"   by {author}\n"
+        entry += f"   {word_count} words\n\n"
+        entry += f"- {url}\n"
+    else:  # book
+        entry = f"\n{title}\n"
+        if author:
+            entry += f"   Author: {author}\n"
+        entry += f"   Start: {date_str}\n"
+        entry += f"   URL: {url}\n"
+        entry += f"   Word count: {word_count}\n"
+        entry += f"   End: ?\n"
+    
+    return entry
+
+
+def append_to_file(file_path, entry):
+    """Append entry to file, creating it if it doesn't exist."""
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(file_path, 'a', encoding='utf-8') as f:
+        f.write(entry)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Log reading materials from URLs to your reading log.'
+    )
+    parser.add_argument(
+        'url',
+        help='URL of the article or book to log'
+    )
+    parser.add_argument(
+        '--type',
+        choices=['article', 'book'],
+        help='Force content type (article or book). If not specified, will be determined automatically.'
+    )
+    parser.add_argument(
+        '--base-dir',
+        default='.',
+        help='Base directory for reading log (default: current directory)'
+    )
+    
+    args = parser.parse_args()
+    
+    print(f"Fetching content from: {args.url}")
+    
+    try:
+        # Fetch content
+        html_content = fetch_url_content(args.url)
+        
+        # Extract text
+        text = extract_text_from_html(html_content)
+        
+        # Count words
+        word_count = count_words(text)
+        print(f"Word count: {word_count}")
+        
+        # Extract metadata
+        title, author = extract_metadata(html_content, args.url)
+        print(f"Title: {title}")
+        if author:
+            print(f"Author: {author}")
+        
+        # Determine type
+        content_type = args.type or determine_type(word_count, args.url)
+        print(f"Content type: {content_type}")
+        
+        # Get file path
+        file_path = get_file_path(content_type, args.base_dir)
+        print(f"Writing to: {file_path}")
+        
+        # Format entry
+        entry = format_entry(
+            content_type,
+            title,
+            author,
+            word_count,
+            args.url,
+            datetime.now()
+        )
+        
+        # Append to file
+        append_to_file(file_path, entry)
+        
+        print(f"\n✓ Successfully logged to {file_path}")
+        
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+    
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())
