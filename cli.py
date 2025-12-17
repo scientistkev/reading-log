@@ -119,12 +119,14 @@ def get_file_path(content_type, base_dir="."):
     return year_dir / filename
 
 
-def format_entry(content_type, title, author, word_count, url, date):
+def format_entry(content_type, title, author, word_count, url, date, include_date_header=True):
     """Format entry according to existing file structure."""
     if content_type == "article":
         # Articles use full date format with year
         date_str = date.strftime("%B %d, %Y")
-        entry = f"\n--- {date_str} ---\n\n"
+        entry = ""
+        if include_date_header:
+            entry = f"\n--- {date_str} ---\n\n"
         entry += f"-- Read: {title}\n"
         if author:
             entry += f"   by {author}\n"
@@ -141,6 +143,26 @@ def format_entry(content_type, title, author, word_count, url, date):
         entry += f"   End: ?\n"
     
     return entry
+
+
+def has_same_date_header(file_path, date_str):
+    """Check if the file already contains the same date header near the end."""
+    file_path = Path(file_path)
+    if not file_path.exists():
+        return False
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            # Check the last 20 lines for the date header pattern
+            # This should be enough to catch if the last entry already has this date
+            pattern = f"--- {date_str} ---"
+            for line in lines[-20:]:
+                if pattern in line:
+                    return True
+            return False
+    except Exception:
+        return False
 
 
 def append_to_file(file_path, entry):
@@ -200,6 +222,15 @@ def main():
         file_path = get_file_path(content_type, args.base_dir)
         print(f"Writing to: {file_path}")
         
+        # Get current date
+        current_date = datetime.now()
+        date_str = current_date.strftime("%B %d, %Y")
+        
+        # Check if file already has the same date header (for articles)
+        include_date_header = True
+        if content_type == "article":
+            include_date_header = not has_same_date_header(file_path, date_str)
+        
         # Format entry
         entry = format_entry(
             content_type,
@@ -207,7 +238,8 @@ def main():
             author,
             word_count,
             args.url,
-            datetime.now()
+            current_date,
+            include_date_header=include_date_header
         )
         
         # Append to file
