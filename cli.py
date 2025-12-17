@@ -170,8 +170,44 @@ def append_to_file(file_path, entry):
     file_path = Path(file_path)
     file_path.parent.mkdir(parents=True, exist_ok=True)
     
+    # Check if file exists and has content (for verification)
+    file_exists = file_path.exists()
+    existing_content_length = 0
+    if file_exists:
+        try:
+            existing_content_length = file_path.stat().st_size
+        except Exception:
+            pass
+    
+    # Ensure entry starts with proper newline if file exists and has content
+    if file_exists and existing_content_length > 0:
+        # Check if file ends with newline, if not, add one before entry
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                # Read last character to check for newline
+                f.seek(max(0, existing_content_length - 1))
+                last_char = f.read(1)
+                if last_char and last_char != '\n':
+                    # File doesn't end with newline, ensure entry starts with one
+                    if not entry.startswith('\n'):
+                        entry = '\n' + entry
+        except Exception:
+            # If we can't read, just proceed with append
+            pass
+    
+    # Append to file using 'a' mode (append mode, creates file if it doesn't exist)
     with open(file_path, 'a', encoding='utf-8') as f:
         f.write(entry)
+    
+    # Verify the file was appended to (not overwritten)
+    if file_exists and existing_content_length > 0:
+        try:
+            new_size = file_path.stat().st_size
+            if new_size < existing_content_length:
+                raise Exception(f"File appears to have been truncated! Original size: {existing_content_length}, New size: {new_size}")
+        except Exception as e:
+            # Log warning but don't fail - the append should have worked
+            print(f"Warning: Could not verify file append: {e}", file=sys.stderr)
 
 
 def main():
