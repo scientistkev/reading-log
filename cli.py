@@ -17,13 +17,17 @@ from bs4 import BeautifulSoup
 def fetch_url_content(url):
     """Fetch content from a URL and return the HTML."""
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.text
-    except requests.RequestException as e:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(url, wait_until='networkidle', timeout=30000)
+            # Wait a bit for any dynamic content to render
+            page.wait_for_timeout(2000)
+            content = page.content()
+            browser.close()
+            return content
+    except Exception as e:
         raise Exception(f"Failed to fetch URL: {e}")
 
 
@@ -35,13 +39,24 @@ def extract_text_from_html(html_content):
     for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
         script.decompose()
     
-    # Try to find main content areas
-    main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile(r'content|article|post|entry', re.I))
+    # Try to find main content areas - check each and use the one with most content
+    candidates = [
+        soup.find('main'),
+        soup.find('article'),
+    ]
+    # Find ALL divs matching content patterns and add them as candidates
+    content_divs = soup.find_all('div', class_=re.compile(r'content|article|post|entry|text-block|transcript|body', re.I))
+    candidates.extend(content_divs)
     
-    if main_content:
-        text = main_content.get_text(separator=' ', strip=True)
-    else:
-        # Fallback to body text
+    text = ""
+    for candidate in candidates:
+        if candidate:
+            candidate_text = candidate.get_text(separator=' ', strip=True)
+            if len(candidate_text) > len(text):
+                text = candidate_text
+    
+    # Fallback to body text if no good candidate found
+    if len(text) < 100:
         text = soup.get_text(separator=' ', strip=True)
     
     # Clean up whitespace
