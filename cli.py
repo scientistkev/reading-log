@@ -118,7 +118,11 @@ def determine_type(word_count, url):
 
 
 def get_file_path(content_type, base_dir="."):
-    """Get the appropriate file path based on content type and current date."""
+    """Get the appropriate file path based on content type and current date.
+    
+    Checks for existing files in subdirectories (articles/, books/) first,
+    then falls back to creating in the year directory.
+    """
     now = datetime.now()
     year = now.year
     month_name = now.strftime("%B").lower()
@@ -127,10 +131,22 @@ def get_file_path(content_type, base_dir="."):
     year_dir.mkdir(exist_ok=True)
     
     if content_type == "book":
+        subdir = "books"
         filename = f"{month_name}-books.txt"
     else:
+        subdir = "articles"
         filename = f"{month_name}-articles.txt"
     
+    # Check if file exists in subdirectory first
+    subdir_path = year_dir / subdir / filename
+    if subdir_path.exists():
+        return subdir_path
+    
+    # Check if subdirectory exists (use it even for new files)
+    if (year_dir / subdir).is_dir():
+        return subdir_path
+    
+    # Fallback to year directory
     return year_dir / filename
 
 
